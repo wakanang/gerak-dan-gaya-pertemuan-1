@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modul Ajar Interaktif: Konsep Gerak, Jarak, & Perpindahan</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Toast Notification / Custom Modal -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3">
+        <i data-lucide="info" class="w-5 h-5 text-sky-400"></i>
+        <span id="toast-message" class="text-sm font-medium">Pesan sistem...</span>
+    </div>
+
+    <!-- Top Navigation Header -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-2 rounded-xl">
+                    <i data-lucide="compass" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Fisika Kelas VII: Pertemuan 1</h1>
+                    <p class="text-xs text-indigo-200">Konsep Gerak, Jarak, dan Perpindahan (2 JP × 40 Menit)</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="hidden sm:flex items-center space-x-2 bg-indigo-700/60 px-3 py-1.5 rounded-lg text-xs">
+                    <i data-lucide="user" class="w-4 h-4 text-indigo-200"></i>
+                    <input type="text" id="student-name" placeholder="Nama Peserta Didik..." class="bg-transparent text-white placeholder-indigo-300 focus:outline-none w-36">
+                </div>
+                <button onclick="resetApp()" class="bg-indigo-500 hover:bg-indigo-400 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center space-x-1">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span class="hidden md:inline">Reset Sesi</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- Sidebar Navigation (Steps) -->
+        <aside class="lg:col-span-1 space-y-3">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Alur Pembelajaran</h2>
+                <nav class="space-y-1" id="nav-tabs">
+                    <button onclick="switchTab('pendahuluan')" data-tab="pendahuluan" class="nav-btn w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition text-indigo-600 bg-indigo-50">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="book-open" class="w-4 h-4"></i>
+                            <span>1. Pendahuluan & Apersepsi</span>
+                        </div>
+                        <span id="badge-pendahuluan" class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                    </button>
+
+                    <button onclick="switchTab('tujuan')" data-tab="tujuan" class="nav-btn w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="target" class="w-4 h-4"></i>
+                            <span>2. Tujuan & Pemahaman</span>
+                        </div>
+                        <span id="badge-tujuan" class="w-2 h-2 rounded-full bg-slate-300"></span>
+                    </button>
+
+                    <button onclick="switchTab('materi')" data-tab="materi" class="nav-btn w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="activity" class="w-4 h-4"></i>
+                            <span>3. Konsep Dasar Gerak</span>
+                        </div>
+                        <span id="badge-materi" class="w-2 h-2 rounded-full bg-slate-300"></span>
+                    </button>
+
+                    <button onclick="switchTab('simulasi')" data-tab="simulasi" class="nav-btn w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="map" class="w-4 h-4"></i>
+                            <span>4. Simulasi Jarak & Perpindahan</span>
+                        </div>
+                        <span id="badge-simulasi" class="w-2 h-2 rounded-full bg-slate-300"></span>
+                    </button>
+
+                    <button onclick="switchTab('lkpd')" data-tab="lkpd" class="nav-btn w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>5. LKPD Kelompok</span>
+                        </div>
+                        <span id="badge-lkpd" class="w-2 h-2 rounded-full bg-slate-300"></span>
+                    </button>
+
+                    <button onclick="switchTab('penutup')" data-tab="penutup" class="nav-btn w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-50">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="award" class="w-4 h-4"></i>
+                            <span>6. Penutup & Refleksi</span>
+                        </div>
+                        <span id="badge-penutup" class="w-2 h-2 rounded-full bg-slate-300"></span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Quick Status Card -->
+            <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center space-x-2 text-indigo-300 text-xs font-semibold mb-1">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                    <span>MODUL AJAR KURIKULUM MERDEKA</span>
+                </div>
+                <h3 class="text-sm font-bold mb-2">Ilmu Pengetahuan Alam (IPA)</h3>
+                <p class="text-xs text-slate-300 leading-relaxed">Topik: Besaran Gerak Benda dalam Kehidupan Sehari-hari.</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Panel -->
+        <main class="lg:col-span-3 space-y-6">
+
+            <!-- TAB 1: PENDAHULUAN -->
+            <section id="tab-pendahuluan" class="tab-content space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center space-x-3 pb-4 border-b border-slate-100">
+                        <div class="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Pendahuluan & Apersepsi</h2>
+                            <p class="text-xs text-slate-500">Mulai kegiatan dengan kedisiplinan dan rangsangan pemikiran awal.</p>
+                        </div>
+                    </div>
+
+                    <!-- Checklist Kegiatan -->
+                    <div class="mt-6 space-y-4">
+                        <h3 class="text-sm font-semibold text-slate-700">1. Persiapan Kelas & Kehadiran</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="flex items-center space-x-3 p-3 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                                <input type="checkbox" id="check-doa" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" onchange="updateProgress()">
+                                <span class="text-sm font-medium text-slate-700">Berdoa sebelum memulai pelajaran</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                                <input type="checkbox" id="check-hadir" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" onchange="updateProgress()">
+                                <span class="text-sm font-medium text-slate-700">Pemeriksaan kehadiran peserta didik</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Pertanyaan Pemantik -->
+                    <div class="mt-8 space-y-4">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="help-circle" class="w-5 h-5 text-amber-500"></i>
+                            <h3 class="text-sm font-semibold text-slate-700">2. Pertanyaan Pemantik (Apersepsi)</h3>
+                        </div>
+                        <p class="text-xs text-slate-500">Jawablah pertanyaan berikut berdasarkan pengalaman perjalanan kalian dari rumah ke sekolah:</p>
+
+                        <div class="space-y-4 bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+                            <div>
+                                <label class="block text-xs font-semibold text-amber-900 mb-1">Seberapa jauh sekolah ini dari rumah kalian?</label>
+                                <input type="text" id="answer-seberapa-jauh" placeholder="Contoh: Kurang lebih 3 kilometer..." class="w-full bg-white border border-amber-200 rounded-lg p-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-amber-900 mb-1">Bagaimana rute perjalanan kalian dari rumah ke sekolah?</label>
+                                <textarea id="answer-rute" rows="2" placeholder="Contoh: Keluar rumah belok kanan, lurus melewati minimarket, lalu belok kiri ke gerbang sekolah..." class="w-full bg-white border border-amber-200 rounded-lg p-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                            </div>
+                            <button onclick="saveApersepsi()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition shadow-sm">
+                                Simpan Jawaban Apersepsi
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Next button -->
+                    <div class="mt-8 flex justify-end">
+                        <button onclick="switchTab('tujuan')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <span>Lanjut ke Tujuan Pembelajaran</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: TUJUAN PEMBELAJARAN -->
+            <section id="tab-tujuan" class="tab-content hidden space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center space-x-3 pb-4 border-b border-slate-100">
+                        <div class="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
+                            <i data-lucide="target" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Tujuan Pembelajaran & Pemahaman Bermakna</h2>
+                            <p class="text-xs text-slate-500">Kompetensi yang akan dicapai pada pertemuan ini.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">1</div>
+                            <h3 class="font-bold text-slate-900 text-sm">Menjelaskan Konsep Gerak</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Peserta didik dapat menjelaskan konsep gerak dan memberikan contoh nyata peristiwa gerak dalam kegiatan sehari-hari.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">2</div>
+                            <h3 class="font-bold text-slate-900 text-sm">Jarak vs Perpindahan</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Peserta didik mampu membedakan besaran jarak dan perpindahan secara konsep fisika maupun perhitungan sederhana.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 bg-gradient-to-r from-indigo-50 to-purple-50 p-5 rounded-2xl border border-indigo-100">
+                        <h3 class="text-xs font-bold text-indigo-900 uppercase tracking-wider mb-2 flex items-center space-x-2">
+                            <i data-lucide="award" class="w-4 h-4 text-indigo-600"></i>
+                            <span>Pemahaman Bermakna</span>
+                        </h3>
+                        <p class="text-sm text-indigo-950 leading-relaxed">
+                            Peserta didik mampu mengukur dan menjelaskan konsep gerak serta besaran jarak dan perpindahan untuk menjelaskan berbagai peristiwa dalam kehidupan sehari-hari (seperti navigasi perjalanan, olahraga, dan mobilitas).
+                        </p>
+                    </div>
+
+                    <div class="mt-8 flex justify-between">
+                        <button onclick="switchTab('pendahuluan')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            <span>Kembali</span>
+                        </button>
+                        <button onclick="switchTab('materi')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <span>Lanjut ke Konsep Dasar Gerak</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: MATERI KONSEP DASAR GERAK -->
+            <section id="tab-materi" class="tab-content hidden space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center space-x-3 pb-4 border-b border-slate-100">
+                        <div class="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
+                            <i data-lucide="activity" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Konsep Dasar Gerak Benda</h2>
+                            <p class="text-xs text-slate-500">Definisi gerak relatif dan titik acuan.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-6">
+                        <!-- Definisi Gerak -->
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <h3 class="font-bold text-slate-900 text-base flex items-center space-x-2">
+                                <i data-lucide="book-open" class="w-5 h-5 text-indigo-600"></i>
+                                <span>Apa itu Gerak?</span>
+                            </h3>
+                            <p class="text-sm text-slate-700 leading-relaxed">
+                                Dalam fisika, suatu benda dikatakan <strong>bergerak</strong> jika kedudukannya mengalami perubahan terhadap suatu <strong>titik acuan</strong> (titik pengamatan). Gerak bersifat <em>relatif</em>, artinya keadaan gerak suatu benda bergantung pada titik acuan yang digunakan.
+                            </p>
+                        </div>
+
+                        <!-- Interaktif Titik Acuan -->
+                        <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 space-y-4">
+                            <h4 class="font-bold text-indigo-900 text-sm">Ilustrasi Relatifnya Gerak:</h4>
+                            <p class="text-xs text-slate-600">Perhatikan bus yang sedang berjalan meninggalkan halte. Pilih titik acuannya:</p>
+                            
+                            <div class="flex flex-wrap gap-3">
+                                <button onclick="setAcuan('halte')" id="btn-halte" class="px-4 py-2 bg-white border border-indigo-200 rounded-xl text-xs font-semibold text-indigo-700 shadow-sm hover:bg-indigo-600 hover:text-white transition">Titik Acuan: Orang di Halte</button>
+                                <button onclick="setAcuan('penumpang')" id="btn-penumpang" class="px-4 py-2 bg-white border border-indigo-200 rounded-xl text-xs font-semibold text-indigo-700 shadow-sm hover:bg-indigo-600 hover:text-white transition">Titik Acuan: Penumpang di Dalam Bus</button>
+                            </div>
+
+                            <div id="acuan-result" class="bg-white p-4 rounded-xl border border-indigo-100 text-xs text-slate-700 italic">
+                                Klik salah satu tombol di atas untuk melihat bagaimana gerak diamati berdasarkan titik acuannya.
+                            </div>
+                        </div>
+
+                        <!-- Contoh Gerak Sehari-hari -->
+                        <div class="space-y-3">
+                            <h4 class="font-bold text-slate-900 text-sm">Contoh Gerak Sehari-hari (Tuliskan pengamatanmu):</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <input type="text" id="contoh-gerak-1" placeholder="Contoh: Sepeda yang dikayuh ke toko..." class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="contoh-gerak-2" placeholder="Contoh: Bola basket yang dilempar ke ring..." class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-between">
+                        <button onclick="switchTab('tujuan')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            <span>Kembali</span>
+                        </button>
+                        <button onclick="switchTab('simulasi')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <span>Lanjut ke Simulasi Jarak & Perpindahan</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: SIMULASI JARAK & PERPINDAHAN -->
+            <section id="tab-simulasi" class="tab-content hidden space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center space-x-3 pb-4 border-b border-slate-100">
+                        <div class="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
+                            <i data-lucide="map" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Simulasi Interaktif: Jarak vs Perpindahan</h2>
+                            <p class="text-xs text-slate-500">Bedakan antara panjang lintasan total (jarak) dengan posisi awal ke akhir (perpindahan).</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Simulation Sandbox -->
+                    <div class="mt-6 space-y-6">
+                        <div class="bg-slate-900 text-white p-5 rounded-2xl space-y-4">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                <div>
+                                    <h3 class="text-sm font-bold text-indigo-300">Lab Gerak Mini</h3>
+                                    <p class="text-xs text-slate-400">Atur pergerakan objek Budi dari Titik A ke Titik B lalu ke Titik C.</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="resetSim()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-xs rounded-lg transition text-slate-300">Reset Simulasi</button>
+                                </div>
+                            </div>
+
+                            <!-- Visual Map Grid / Canvas representation -->
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col items-center justify-center min-h-[180px] relative overflow-hidden">
+                                <div class="w-full flex justify-between text-xs text-slate-500 px-4 mb-2 font-mono">
+                                    <span>0m (Rumah)</span>
+                                    <span>3m</span>
+                                    <span>7m</span>
+                                    <span>10m (Toko)</span>
+                                </div>
+                                <!-- Track bar -->
+                                <div class="w-full h-3 bg-slate-800 rounded-full relative my-4">
+                                    <div id="player-marker" class="absolute -top-3 w-9 h-9 bg-indigo-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg transition-all duration-500 left-0">
+                                        🚶‍♂️
+                                    </div>
+                                </div>
+                                <div id="sim-status-text" class="text-xs text-indigo-300 font-medium text-center mt-2">
+                                    Posisi awal: Budi berada di Rumah (0 meter).
+                                </div>
+                            </div>
+
+                            <!-- Control Buttons -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <button onclick="moveSim(1)" class="bg-indigo-600 hover:bg-indigo-500 py-2.5 px-4 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-2">
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                    <span>1. Jalan ke Timur (4 meter)</span>
+                                </button>
+                                <button onclick="moveSim(2)" class="bg-indigo-600 hover:bg-indigo-500 py-2.5 px-4 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-2">
+                                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                                    <span>2. Putar ke Barat (3 meter)</span>
+                                </button>
+                                <button onclick="moveSim(3)" class="bg-indigo-600 hover:bg-indigo-500 py-2.5 px-4 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-2">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                    <span>3. Selesai (Hitung Jarak & Perpindahan)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Real-time calculation results -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100">
+                                <h4 class="text-xs font-bold text-indigo-900 uppercase tracking-wider mb-1">Jarak (Distance)</h4>
+                                <p id="result-jarak" class="text-2xl font-bold text-indigo-600">0 meter</p>
+                                <p class="text-xs text-slate-500 mt-1">Panjang total seluruh lintasan yang ditempuh tanpa memperdulikan arah.</p>
+                            </div>
+                            <div class="bg-purple-50/60 p-4 rounded-xl border border-purple-100">
+                                <h4 class="text-xs font-bold text-purple-900 uppercase tracking-wider mb-1">Perpindahan (Displacement)</h4>
+                                <p id="result-perpindahan" class="text-2xl font-bold text-purple-600">0 meter</p>
+                                <p class="text-xs text-slate-500 mt-1">Perubahan posisi dari titik awal ke titik akhir (memperhatikan arah).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-between">
+                        <button onclick="switchTab('materi')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            <span>Kembali</span>
+                        </button>
+                        <button onclick="switchTab('lkpd')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <span>Lanjut ke LKPD Kelompok</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: LKPD KELOMPOK -->
+            <section id="tab-lkpd" class="tab-content hidden space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center space-x-3 pb-4 border-b border-slate-100">
+                        <div class="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
+                            <i data-lucide="file-text" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Lembar Kerja Peserta Didik (LKPD)</h2>
+                            <p class="text-xs text-slate-500">Kerjakan bersama kelompok (3-4 orang) lalu kirimkan hasilnya.</p>
+                        </div>
+                    </div>
+
+                    <!-- Group Name Input -->
+                    <div class="mt-6 bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kelompok & Anggota:</label>
+                            <input type="text" id="group-names" placeholder="Contoh: Kelompok 1 (Andi, Budi, Siti)" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+
+                    <!-- LKPD Questions -->
+                    <div class="mt-6 space-y-6">
+                        <!-- Soal 1 -->
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <span class="inline-block px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg">Pertanyaan 1</span>
+                            <p class="text-sm font-medium text-slate-900">Mengapa gerak dikatakan bersifat relatif? Berikan contoh dalam kehidupan sehari-hari!</p>
+                            <textarea id="lkpd-q1" rows="3" placeholder="Tuliskan jawaban kelompok di sini..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+
+                        <!-- Soal 2 -->
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <span class="inline-block px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg">Pertanyaan 2</span>
+                            <p class="text-sm font-medium text-slate-900">Seseorang berjalan ke timur sejauh 6 meter, kemudian berbalik arah ke barat sejauh 2 meter. Berapakah besar <strong>jarak</strong> dan <strong>perpindahan</strong> orang tersebut?</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Jarak:</label>
+                                    <input type="text" id="lkpd-q2-jarak" placeholder="Contoh: 8 meter" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Perpindahan:</label>
+                                    <input type="text" id="lkpd-q2-perpindahan" placeholder="Contoh: 4 meter ke timur" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Soal 3 -->
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <span class="inline-block px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg">Pertanyaan 3</span>
+                            <p class="text-sm font-medium text-slate-900">Apa perbedaan mendasar antara besaran skalar (jarak) dan besaran vektor (perpindahan)?</p>
+                            <textarea id="lkpd-q3" rows="3" placeholder="Tuliskan jawaban kelompok di sini..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Options Action Section (WA & Drive) -->
+                    <div class="mt-8 bg-indigo-50/60 p-5 rounded-2xl border border-indigo-100 space-y-4">
+                        <h3 class="text-sm font-bold text-indigo-900 flex items-center space-x-2">
+                            <i data-lucide="send" class="w-4 h-4 text-indigo-600"></i>
+                            <span>Pengumpulan Hasil Belajar</span>
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Pilih metode pengumpulan di bawah ini. Jawaban akan dikirim dalam bentuk rangkuman rapi ke WhatsApp Guru atau diunggah ke folder Google Drive Kelas.
+                        </p>
+                        
+                        <div class="flex flex-wrap gap-3 pt-2">
+                            <!-- WhatsApp Send Button -->
+                            <button onclick="sendToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm flex items-center space-x-2">
+                                <i data-lucide="message-square" class="w-4 h-4"></i>
+                                <span>Kirim Jawaban ke WhatsApp Guru</span>
+                            </button>
+
+                            <!-- Google Drive Link Button -->
+                            <a href="https://drive.google.com/drive/u/4/folders/1hS-a_MzMGZQVnrG4lUn2I9Ajwk_zkRsB?usp=sharing" target="_blank" rel="noopener noreferrer" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm flex items-center space-x-2">
+                                <i data-lucide="hard-drive" class="w-4 h-4"></i>
+                                <span>Buka Folder Google Drive Tugas</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-between">
+                        <button onclick="switchTab('simulasi')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            <span>Kembali</span>
+                        </button>
+                        <button onclick="switchTab('penutup')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <span>Lanjut ke Penutup</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 6: PENUTUP -->
+            <section id="tab-penutup" class="tab-content hidden space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                    <div class="flex items-center space-x-3 pb-4 border-b border-slate-100">
+                        <div class="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">Penutup, Refleksi, & Pertemuan Selanjutnya</h2>
+                            <p class="text-xs text-slate-500">Peninjauan kembali dan informasi pertemuan berikutnya.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-6">
+                        <!-- Refleksi Ringkas -->
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <h3 class="font-bold text-slate-900 text-sm">Kesimpulan Pembelajaran Hari Ini:</h3>
+                            <ul class="list-disc list-inside text-xs text-slate-700 space-y-2 leading-relaxed">
+                                <li>Gerak adalah perubahan posisi suatu benda terhadap titik acuan tertentu dan bersifat relatif.</li>
+                                <li>Jarak adalah panjang seluruh lintasan yang ditempuh oleh benda (besaran skalar).</li>
+                                <li>Perpindahan adalah panjang garis lurus dari posisi awal ke posisi akhir benda dengan memperhatikan arah (besaran vektor).</li>
+                            </ul>
+                        </div>
+
+                        <!-- Info Pertemuan Selanjutnya -->
+                        <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-5 rounded-2xl space-y-2">
+                            <div class="flex items-center space-x-2 text-indigo-300 text-xs font-bold">
+                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                                <span>INFORMASI PERTEMUAN SELANJUTNYA</span>
+                            </div>
+                            <h4 class="font-bold text-sm">Kelajuan, Kecepatan, dan Percepatan</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Pada pertemuan berikutnya, kita akan membahas bagaimana menghitung seberapa cepat benda bergerak serta perbedaan antara kelajuan (speed) dan kecepatan (velocity).
+                            </p>
+                        </div>
+
+                        <!-- Doa Penutup -->
+                        <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div>
+                                <h4 class="font-bold text-emerald-900 text-sm">Berdoa Penutup & Salam</h4>
+                                <p class="text-xs text-emerald-700 mt-0.5">Mari akhiri pertemuan hari ini dengan doa penutup majelis.</p>
+                            </div>
+                            <button onclick="finishSession()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm flex items-center space-x-2">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                                <span>Selesaikan Pembelajaran</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-start">
+                        <button onclick="switchTab('lkpd')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                            <span>Kembali ke LKPD</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-auto py-6 text-center text-xs text-slate-400 border-t border-slate-200">
+        <p>Modul Ajar IPA Kurikulum Merdeka • Kelas VII SMP/MTs • Pertemuan 1</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-600', 'bg-indigo-50');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-50');
+                const badge = btn.querySelector('span[id^="badge-"]');
+                badge.classList.remove('bg-indigo-600');
+                badge.classList.add('bg-slate-300');
+            });
+
+            const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                activeBtn.classList.add('text-indigo-600', 'bg-indigo-50');
+                const activeBadge = activeBtn.querySelector('span[id^="badge-"]');
+                activeBadge.classList.remove('bg-slate-300');
+                activeBadge.classList.add('bg-indigo-600');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-message');
+            msg.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function updateProgress() {
+            const doa = document.getElementById('check-doa').checked;
+            const hadir = document.getElementById('check-hadir').checked;
+            if(doa && hadir) {
+                showToast("Persiapan awal kelas selesai! Bagus.");
+            }
+        }
+
+        function saveApersepsi() {
+            const jauh = document.getElementById('answer-seberapa-jauh').value;
+            const rute = document.getElementById('answer-rute').value;
+            if(!jauh || !rute) {
+                showToast("Mohon lengkapi jawaban apersepsi terlebih dahulu.");
+                return;
+            }
+            showToast("Jawaban apersepsi berhasil disimpan!");
+        }
+
+        // Titik Acuan logic
+        function setAcuan(type) {
+            const resultBox = document.getElementById('acuan-result');
+            const btnHalte = document.getElementById('btn-halte');
+            const btnPenumpang = document.getElementById('btn-penumpang');
+
+            btnHalte.classList.remove('bg-indigo-600', 'text-white');
+            btnPenumpang.classList.remove('bg-indigo-600', 'text-white');
+
+            if(type === 'halte') {
+                btnHalte.classList.add('bg-indigo-600', 'text-white');
+                resultBox.innerHTML = "<strong>Titik Acuan Orang di Halte:</strong> Orang di halte melihat bus bergerak menjauh. Jadi, bagi pengamat di halte, penumpang dan bus tersebut <strong>bergerak</strong>.";
+            } else {
+                btnPenumpang.classList.add('bg-indigo-600', 'text-white');
+                resultBox.innerHTML = "<strong>Titik Acuan Penumpang di Bus:</strong> Penumpang di sebelah kursi melihat teman duduknya diam tidak berubah jarak. Jadi, bagi sesama penumpang di dalam bus, mereka berstatus <strong>diam (tidak bergerak)</strong> terhadap satu sama lain.";
+            }
+            showToast("Titik acuan diperbarui.");
+        }
+
+        // Simulation logic
+        let simStep = 0;
+        function moveSim(step) {
+            const marker = document.getElementById('player-marker');
+            const statusText = document.getElementById('sim-status-text');
+            const resJarak = document.getElementById('result-jarak');
+            const resPerpindahan = document.getElementById('result-perpindahan');
+
+            simStep = step;
+            if(step === 1) {
+                marker.style.left = '60%';
+                statusText.textContent = "Langkah 1: Budi berjalan ke Timur sejauh 4 meter.";
+                resJarak.textContent = "4 meter";
+                resPerpindahan.textContent = "4 meter (ke Timur)";
+            } else if(step === 2) {
+                marker.style.left = '30%';
+                statusText.textContent = "Langkah 2: Budi berbalik arah ke Barat sejauh 3 meter.";
+                resJarak.textContent = "7 meter (4m + 3m)";
+                resPerpindahan.textContent = "1 meter (ke Timur dari titik awal)";
+            } else if(step === 3) {
+                marker.style.left = '30%';
+                statusText.textContent = "Simulasi Selesai! Jarak total = 7 meter, Perpindahan akhir = 1 meter dari posisi awal.";
+                showToast("Simulasi selesai dianalisis!");
+            }
+        }
+
+        function resetSim() {
+            simStep = 0;
+            const marker = document.getElementById('player-marker');
+            const statusText = document.getElementById('sim-status-text');
+            const resJarak = document.getElementById('result-jarak');
+            const resPerpindahan = document.getElementById('result-perpindahan');
+
+            marker.style.left = '0%';
+            statusText.textContent = "Posisi awal: Budi berada di Rumah (0 meter).";
+            resJarak.textContent = "0 meter";
+            resPerpindahan.textContent = "0 meter";
+            showToast("Simulasi direset.");
+        }
+
+        function submitLKPD() {
+            sendToWhatsApp();
+        }
+
+        function sendToWhatsApp() {
+            const groupName = document.getElementById('group-names').value;
+            const studentName = document.getElementById('student-name').value || "Siswa";
+            const q1 = document.getElementById('lkpd-q1').value;
+            const q2J = document.getElementById('lkpd-q2-jarak').value;
+            const q2P = document.getElementById('lkpd-q2-perpindahan').value;
+            const q3 = document.getElementById('lkpd-q3').value;
+            
+            const apersepsiJauh = document.getElementById('answer-seberapa-jauh').value || "-";
+            const apersepsiRute = document.getElementById('answer-rute').value || "-";
+
+            if(!groupName || !q1 || !q2J || !q2P || !q3) {
+                showToast("Mohon lengkapi seluruh pertanyaan LKPD kelompok sebelum dikirim.");
+                return;
+            }
+
+            const phone = "6281373363236";
+            
+            let text = `*LEMBAR KERJA PESERTA DIDIK (LKPD)*\n`;
+            text += `*Topik:* Konsep Gerak, Jarak, & Perpindahan\n`;
+            text += `------------------------------------\n`;
+            text += `*Nama Kelompok / Anggota:* ${groupName}\n`;
+            text += `*Nama Siswa (Sesi):* ${studentName}\n\n`;
+            text += `*--- APERSEPSI ---*\n`;
+            text += `• Seberapa jauh rumah: ${apersepsiJauh}\n`;
+            text += `• Rute perjalanan: ${apersepsiRute}\n\n`;
+            text += `*--- JAWABAN LKPD ---*\n`;
+            text += `*1. Mengapa gerak relatif & contoh:* \n${q1}\n\n`;
+            text += `*2. Perhitungan:* \n- Jarak: ${q2J}\n- Perpindahan: ${q2P}\n\n`;
+            text += `*3. Perbedaan Skalar vs Vektor:* \n${q3}\n`;
+
+            const encodedText = encodeURIComponent(text);
+            const waUrl = `https://wa.me/${phone}?text=${encodedText}`;
+
+            window.open(waUrl, '_blank');
+            showToast("Membuka WhatsApp untuk mengirim hasil jawaban...");
+        }
+
+        function finishSession() {
+            const name = document.getElementById('student-name').value || "Peserta Didik";
+            showToast(`Alhamdulillah, pembelajaran selesai untuk ${name}! Sampai jumpa di pertemuan berikutnya.`);
+        }
+
+        function resetApp() {
+            if(confirm("Yakin ingin mereset seluruh sesi?")) {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
